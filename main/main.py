@@ -50,9 +50,7 @@ class Area:
 #                     pass
 
 
-def follow_segment(search_structure, line):
-    start_area = search_structure.find(line.p1)
-
+def follow_segment(start_area, line):
     j = 0
     areas = [start_area]
 
@@ -67,54 +65,74 @@ def follow_segment(search_structure, line):
     return areas
 
 
-def update_map(trapezoidal_map, search_structure, line):
-    areas = follow_segment(search_structure, line)
+def update_map(start_area, search_structure, line):
+    old_areas = follow_segment(start_area, search_structure)  # finding all areas crossed by the line
+    new_areas = []  # areas which will override old areas
 
-    p = line.p1
-    q = line.p2
+    p = line.p1  # start point of the line
+    q = line.p2  # end point of the line
 
-    # if len(areas) == 1:
-    #     area_0 = areas[0]
-    #
-    #     area_right = Area(area_0.top_line, area_0.but_line, q, area_0.right_p)
-    #     area_top = Area(area_0.top_line, line, p, q)
-    #     area_but = Area(line, area_0.but_line, p, q)
-    #
-    #     area_0.right_p = p
-    #
-    #     area_0.top_right = area_top
-    #     area_0.but_line = area_but
-    #
-    #     area_top.left = area_0
-    #     area_top.right = area_right
-    #
-    #     area_but.left = area_0
-    #     area_but.right = area_right
-    #
-    #     area_right.top_left = area_top
-    #     area_right.but_left = area_but
-    #     area_right.right = area_0.right
-    #
-    # else:
+    top_area = Area(start_area.top_line, line, p, start_area.right_p)  # variable with current area above the line
+    but_area = Area(line, start_area.but_line, p, start_area.right_p)  # variable with current area below the line
 
-    top_area = Area(areas[0].top_line, line, line.p1, areas[0].top_line.p2)
-    but_area = Area(line, areas[0].but_line, line.p1, areas[0].but_line.p2)
+    if not start_area.left_p == p:  # when start of the line is not part of any other line
+        left_area = Area(start_area.top_line, start_area.but_line, start_area.left_p, p)  # area on the left of line
 
-    top_area.left = areas[0]
-    but_area.left = areas[0]
+        left_area.top_right = top_area  # connections from left area
+        left_area.but_right = but_area
 
-    if start_with_point(line):
-        top_area.left = None
-        but_area.left = None
+        top_area.left = left_area   # connections to left area
+        but_area.left = left_area
+
+        new_areas.append(left_area)  # adding area to the list
+
+    for i in range(1, len(old_areas)-1):  # for every area crossed by the line
+        if top_area.right_p.is_above(line):  # last old area has right_p above the line
+            new_top_area = Area(old_areas[i].top_line, line,
+                                old_areas[i].left_p, old_areas[i].right_p)  # new area on the right
+
+            new_top_area.left = top_area  # connecting areas above the line
+            top_area.right = new_top_area
+
+            new_areas.append(top_area)  # adding last area to the list
+
+            top_area = new_top_area  # now we are considering area on the right
+
+            but_area.right_p = \
+                old_areas[i].right_p  # changing right_p of the area below the line (that area will be bigger)
+
+        else:  # last old area has right_p below the line
+            new_but_area = Area(line, old_areas[i].but_line,
+                                old_areas[i].left_p, old_areas[i].right_p)  # new area on the right
+
+            new_but_area.left = but_area   # connecting areas below the line
+            but_area.right = new_but_area
+
+            new_areas.append(but_area)  # adding last area to the list
+
+            but_area = new_but_area  # now we are considering area on the right
+
+            top_area.right_p = \
+                old_areas[i].right_p  # changing right_p of the area above the line (that area will be bigger)
+
+    top_area.right_p = q  # right_p of both areas are the endpoint of the line
+    but_area.right_p = q
+
+    if not old_areas[len(old_areas)-1].right_p == q:  # when end of the line is not part of any other line
+        right_area = Area(old_areas[len(old_areas)-1].top_line, old_areas[len(old_areas)-1].but_line,
+                          q, old_areas[len(old_areas)-1].right_p)  # area on the right of the line
+
+        right_area.top_left = top_area  # connections from right area
+        right_area.but_left = but_area
+
+        top_area.right = right_area  # connections to right area
+        but_area.right = right_area
+
+        new_areas.append(top_area)  # adding last 3 areas to the list
+        new_areas.append(but_area)
+        new_areas.append(right_area)
     else:
-        areas[0].top_right = top_area
-        areas[0].but_right = but_area
+        new_areas.append(top_area)  # adding last 2 areas to the list
+        new_areas.append(but_area)
 
-    for i in range(1, len(areas)):
-        if areas[i].left_p.is_above(line):
-            curr_top_area = Area(areas[i].to_line, line, areas[i].left_p, areas[i].right_p)
-            but_area.right_p = areas[i].right_p
-
-
-
-
+    return old_areas, new_areas  # returning 2 lists
