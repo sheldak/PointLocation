@@ -72,6 +72,12 @@ class Area:
         self.but_left = None
         self.left = None
 
+    def __eq__(self, other):
+        if not isinstance(other, Area):
+            # don't attempt to compare against unrelated types
+            return NotImplemented
+        return self.top_line == self.top_line and self.left_p == self.left_p and self.right_p == self.right_p and self.but_line == other.but_line
+
 
 def make_polygons_from_json(file_name):
     polygons = []
