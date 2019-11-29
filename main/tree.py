@@ -1,5 +1,5 @@
 import enum
-from PointLocation.main.main import *
+from main.main import *
 
 
 class Type(enum.Enum):
