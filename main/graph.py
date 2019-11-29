@@ -16,6 +16,14 @@ class Point:
     def __lt__(self, other):
         return self.x < other.x or (self.x == other.x and self.y < other.y)
 
+    def is_above(self, line):
+        p2, p1 = max(line.p1, line.p2), min(line.p1, line.p2)
+
+        a = (p2[1] - p1[1]) / (p2[0] - p1[0])  # współczynnik kierunkowy
+        b = p1[1] - ((p2[1] - p1[1]) * p1[0]) / (p2[0] - p1[0])  # wyraz wolny
+
+        return self.y > a*self.x + b
+
 
 class Line:
     def __init__(self, p1, p2):
@@ -92,6 +100,18 @@ def make_polygons_from_json(file_name):
     return polygons
 
 
+def make_lines_from_json(file_name):
+    lines = []
+    with open(file_name, 'r') as file:
+        json_lines = file.read()
+
+    json_lines = json.loads(json_lines)
+
+    for line in json_lines:
+        lines.append(Line(line[0], line[1]))
+
+    return lines
+
 def extract_all_lines(polygons):
     lines = SortedSet()
     for polygon in polygons:
@@ -109,13 +129,11 @@ def extract_all_lines(polygons):
 def follow_segment(start_area, line):
     j = 0
     areas = [start_area]
-
-    while line.p2.x > areas[j].right_p:
+    while line.p2.x > areas[j].right_p.x and j < 3:
         if areas[j].right_p.is_above(line):
             areas.append(areas[j].but_right)
         else:
             areas.append(areas[j].top_right)
-
         j += 1
 
     return areas
@@ -194,6 +212,6 @@ def update_map(start_area, line):
     return old_areas, new_areas  # returning 2 lists
 
 
-all_polygons = make_polygons_from_json("../polygons/polygons_1.json")
-
-all_lines = extract_all_lines(all_polygons)
+# all_polygons = make_polygons_from_json("../polygons/polygons_1.json")
+#
+# all_lines = extract_all_lines(all_polygons)

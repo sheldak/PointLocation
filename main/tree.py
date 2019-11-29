@@ -1,5 +1,6 @@
 import enum
-from main.main import *
+from main.graph import *
+# from PointLocation.main.main import *
 
 
 class Type(enum.Enum):
@@ -22,7 +23,9 @@ class Tree:
         self.root = None
 
 
-    def find_area(self, start_point):
+    def find_area(self, line):
+        start_point = line.p1
+
         if self.root is None:
             return None
         par = self.root
@@ -34,10 +37,18 @@ class Tree:
                     par = par.right
             elif par.Type == Type.Line:
                 (x1, y1) = par.key.p1
+                (x2, y2) = par.key.p2
                 if y1 > start_point.y:
                     par = par.right
-                else:
+                elif y1 < start_point.y:
                     par = par.left
+                else:  # the same y
+                    par_slope = (y2 - y1) / (x2 - x1)
+                    line_slope = (line.p2.y - line.p1.y) / (line.p2.x - line.p1.x)
+                    if par_slope > line_slope:
+                        par = par.left
+                    else:
+                        par = par.right
 
         return par
 
@@ -51,9 +62,16 @@ class Tree:
         self.local_area(root.right, old_area, new_areas, "right")
 
 
+    def print_tree(self, root):
+        if root is None:
+            return None
+        print(root.key)
+        self.print_tree(root.left)
+        self.print_tree(root.right)
+
     def init_tree(self):
-        a0,b0 = Point(0,0),Point(50,0)
-        a1,b1 = Point(0,50),Point(50,50)
+        a0,b0 = Point(0,0),Point(400,0) # TODO make it automatical
+        a1,b1 = Point(0,400),Point(400,400)
         line_b = Line(a0,b0)
         line_t = Line(a1,b1)
         start_area = Area(line_t,line_b, a0, b1)
@@ -63,22 +81,27 @@ class Tree:
     def build_tree(self, edges_list):
         self.init_tree()
         for e in edges_list:
-            p = e.p1
-            found_area = self.find_area(p)
-            old_are, new_area = update_map(found_area, e)
-            for area in old_are:
-                self.local_area(self.root, area, new_area, 0)
-        return self.root
+            found_area = self.find_area(e)
+            old_areas, new_areas = update_map(found_area.key, e)
+            for area in old_areas:
+                self.local_area(self.root, area, new_areas, "left")
+        return self
 
 
-    @staticmethod
-    def update_tree(root, new_areas, left_or_right):
+    def update_tree(self, root, new_areas, left_or_right):
         parent = root.parent
         copy_root = root
-        del root
+        isNone = False
+
+        if root.parent is not None:
+            print(root.parent)
+            del root
+
+        if root.parent is None:
+            isNone = True
 
         i = 0
-        while i < 4 and new_areas[i].left_p[0] < copy_root.key.right_p[0]:
+        while i < 4 and new_areas[i].left_p.x < copy_root.key.right_p.x:
             i = i + 1
 
         if left_or_right == "left":
@@ -86,7 +109,13 @@ class Tree:
             if i == 4:
                     parent.left = TreeNode(new_areas[0].right_p, parent, Type.Point)
 
+                    if isNone:
+                        self.root = parent.left
+
                     parent = parent.left
+
+                    if isNone:
+                        del root
 
                     parent.left = TreeNode(new_areas[0], parent, Type.Area)
                     parent.right = TreeNode(new_areas[0].top_right.right_p, parent, Type.Point)
@@ -100,6 +129,8 @@ class Tree:
 
                     parent.left = TreeNode(new_areas[0].top_right, parent, Type.Area)
                     parent.right = TreeNode(new_areas[0].but_right, parent, Type.Area)
+
+
 
             elif i == 3:
                 if new_areas[0].left_p.y != copy_root.key.left_p.y and new_areas[0].right_p.y != copy_root.key.right_p.y :  # nie stykają się
@@ -191,11 +222,14 @@ class Tree:
 
 
 def main():
-    c1 = Point(3,4)
-    d1 = Point(9,8)
-    line1 = Line(c1,d1)
-    edges = [line1]
-    roott = Tree().build_tree(edges)
+    # all_polygons = make_polygons_from_json("../polygons/polygons_1.json")
+    # all_lines = extract_all_lines(all_polygons)
+    all_lines = make_lines_from_json("../polygons/lines_1.json")
+    # TODO randomize lines
+
+    roott = Tree().build_tree(all_lines)
+    roott.print_tree(roott.root)
+    print(roott.find_area(Line(Point(200, 200), Point(200,200))).key.right_p.x)
 
 
 main()
