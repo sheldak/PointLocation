@@ -1,13 +1,60 @@
+from sortedcontainers import SortedSet
+import json
+
+
 class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
+    def __hash__(self):
+        return hash((self.x, self.y))
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
+    def __lt__(self, other):
+        return self.x < other.x or (self.x == other.x and self.y < other.y)
+
 
 class Line:
     def __init__(self, p1, p2):
-        self.p1 = min(p1.x, p2.x)
-        self.p2 = max(p1.x, p2.x)
+        if not isinstance(p1, Point):
+            p1 = Point(p1[0], p1[1])
+
+        if not isinstance(p2, Point):
+            p2 = Point(p2[0], p2[1])
+
+        self.p1 = min(p1, p2)
+        self.p2 = max(p1, p2)
+
+    def __hash__(self):
+        return hash((self.p1, self.p2))
+
+    def __eq__(self, other):
+        return self.p1 == other.p1 and self.p2 == other.p2
+
+    def __lt__(self, other):
+        return self.p1 < other.p1 or (self.p1 == other.p1 and self.p2 < other.p2)
+
+    def print_line(self):
+        print("[[{}, {}], [{}, {}]]".format(self.p1.x, self.p1.y, self.p2.x, self.p2.y))
+
+
+class Polygon:
+    def __init__(self, points):
+        self.points = points
+        self.lines = []
+        self.make_lines()
+
+    def make_lines(self):
+        points = self.points
+        lines = []
+
+        for i in range(len(points)):
+            lines.append(Line(points[i], points[(i+1) % len(points)]))
+
+        self.lines = lines
 
 
 class Area:
@@ -26,28 +73,31 @@ class Area:
         self.left = None
 
 
-# class TrapezoidalMap:
-#     def __init__(self):
-#         self.root = None
-#         self.top_right = None
-#         self.top_left = None
-#         self.but_left = None
-#         self.but_right = None
-#
-#     def insert(self, area):
-#         if self.root is None:
-#             self.root = area
-#         else:
-#             add_right = self
-#             if area.but_line <= add_right.but_right.top_line:
-#                 while add_right.but_right.right_p < area.left_p:
-#                     add_right = add_right.but_right
-#                 prev = add_right.but_left
-#                 prev.but_right = area
-#                 area.but_right = add_right
-#             else:
-#                 while add_right.top_right.right_p:
-#                     pass
+def make_polygons_from_json(file_name):
+    polygons = []
+    with open(file_name, 'r') as file:
+        json_polygons = file.read()
+
+    json_polygons = json.loads(json_polygons)
+
+    for polygon in json_polygons:
+        polygons.append(Polygon(polygon))
+
+    return polygons
+
+
+def extract_all_lines(polygons):
+    lines = SortedSet()
+    for polygon in polygons:
+        for line in polygon.lines:
+            if line not in lines:
+                lines.add(line)
+
+    lines_list = []
+    while lines:
+        lines_list.append(lines.pop())
+
+    return lines_list
 
 
 def follow_segment(start_area, line):
@@ -65,8 +115,8 @@ def follow_segment(start_area, line):
     return areas
 
 
-def update_map(start_area, search_structure, line):
-    old_areas = follow_segment(start_area, search_structure)  # finding all areas crossed by the line
+def update_map(start_area, line):
+    old_areas = follow_segment(start_area, line)  # finding all areas crossed by the line
     new_areas = []  # areas which will override old areas
 
     p = line.p1  # start point of the line
@@ -136,3 +186,8 @@ def update_map(start_area, search_structure, line):
         new_areas.append(but_area)
 
     return old_areas, new_areas  # returning 2 lists
+
+
+all_polygons = make_polygons_from_json("../polygons/polygons_1.json")
+
+all_lines = extract_all_lines(all_polygons)
