@@ -25,6 +25,12 @@ class Area:
         self.but_left = None
         self.left = None
 
+    def __eq__(self, other):
+        if not isinstance(other, Area):
+            # don't attempt to compare against unrelated types
+            return NotImplemented
+        return self.top_line == self.top_line and self.left_p == self.left_p and self.right_p == self.right_p and self.but_line == other.but_line
+
 
 # class TrapezoidalMap:
 #     def __init__(self):
@@ -65,8 +71,8 @@ def follow_segment(start_area, line):
     return areas
 
 
-def update_map(start_area, search_structure, line):
-    old_areas = follow_segment(start_area, search_structure)  # finding all areas crossed by the line
+def update_map(start_area, line):
+    old_areas = follow_segment(start_area, line)  # finding all areas crossed by the line
     new_areas = []  # areas which will override old areas
 
     p = line.p1  # start point of the line

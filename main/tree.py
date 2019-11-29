@@ -1,5 +1,5 @@
 import enum
-from main import *
+from PointLocation.main.main import *
 
 
 class Type(enum.Enum):
@@ -65,7 +65,7 @@ class Tree:
         for e in edges_list:
             p = e.p1
             found_area = self.find_area(p)
-            old_are, new_area = update_map(found_area, edges_list, e)
+            old_are, new_area = update_map(found_area, e)
             for area in old_are:
                 self.local_area(self.root, area, new_area, 0)
         return self.root
