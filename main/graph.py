@@ -36,6 +36,8 @@ class Line:
         self.p1 = min(p1, p2)
         self.p2 = max(p1, p2)
 
+        self.polygon = None
+
     def __hash__(self):
         return hash((self.p1, self.p2))
 
@@ -122,6 +124,7 @@ def extract_all_lines(polygons):
     for polygon in polygons:
         for line in polygon.lines:
             if line not in lines:
+                line.polygon = polygon
                 lines.add(line)
 
     lines_list = []
