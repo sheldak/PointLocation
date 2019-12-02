@@ -36,6 +36,8 @@ class Line:
         self.p1 = min(p1, p2)
         self.p2 = max(p1, p2)
 
+        self.polygon = None
+
     def __hash__(self):
         return hash((self.p1, self.p2))
 
@@ -84,6 +86,13 @@ class Area:
             return NotImplemented
         return self.top_line == other.top_line and self.left_p == other.left_p and self.right_p == other.right_p and self.but_line == other.but_line
 
+    def print_area(self):
+        self.top_line.print_line()
+        self.but_line.print_line()
+        print(self.left_p.x, self.left_p.y)
+        print(self.right_p.x, self.right_p.y)
+        print()
+
 
 def make_polygons_from_json(file_name):
     polygons = []
@@ -116,6 +125,7 @@ def extract_all_lines(polygons):
     for polygon in polygons:
         for line in polygon.lines:
             if line not in lines:
+                line.polygon = polygon
                 lines.add(line)
 
     lines_list = []
@@ -345,5 +355,37 @@ def update_map(start_area, line):
 
 
 # all_polygons = make_polygons_from_json("../polygons/polygons_1.json")
-#
+
 # all_lines = extract_all_lines(all_polygons)
+
+# all_lines = extract_all_lines(all_polygons)
+
+# areas = []
+# top_line = Line([0, 100], [100, 100])
+# but_line = Line([0,0], [100,0])
+# area1 = Area(top_line, but_line, Point(0,0), Point(100,100))
+#
+# line_1 = Line([1, 1], [3, 3])
+#
+# olds, news = update_map(area1, line_1)
+#
+# olds[0].print_area()
+# for area in news:
+#     area.print_area()
+#
+# line_2 = Line([1, 1], [5, 1])
+# olds, news = update_map(news[2], line_2)
+#
+# # olds[0].print_area()
+# # for area in news:
+# #     area.print_area()
+#
+#
+# line_3 = Line([3, 3], [5, 1])
+# news[1].print_area()
+# olds, news = update_map(news[1].top_left.top_right, line_3)
+#
+# for area in news:
+#     area.print_area()
+#
+
