@@ -309,7 +309,6 @@ class Tree:
                 #parent.right = TreeNode(new_areas[1], parent, Type.Area)
 
 
-
 def main():
     # all_polygons = make_polygons_from_json("/polygons/polygons_1.json")
     # all_lines = extract_all_lines(all_polygons)
