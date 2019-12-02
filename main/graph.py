@@ -97,7 +97,7 @@ class Area:
         if not isinstance(other, Area):
             # don't attempt to compare against unrelated types
             return NotImplemented
-        return self.top_line == self.top_line and self.left_p == self.left_p and self.right_p == self.right_p and self.but_line == other.but_line
+        return self.top_line == other.top_line and self.left_p == other.left_p and self.right_p == other.right_p and self.but_line == other.but_line
 
     def print_area(self):
         self.top_line.print_line()

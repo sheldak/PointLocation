@@ -105,8 +105,10 @@ class Tree:
 
     def build_tree(self, edges_list):
         self.init_tree()
+        # visualize(self.root)
         old_areas, new_areas = update_map(self.root.key, edges_list[0])
         self.first_step(new_areas)
+        # visualize(self.root)
 
         for i in range(1, len(edges_list)):
             e = edges_list[i]
@@ -114,6 +116,7 @@ class Tree:
             old_areas, new_areas = update_map(found_area.key, e)
             for area in old_areas:
                 self.local_area(self.root, area, new_areas, "left")
+                # visualize(self.root)
         return self
 
     def add_lead(self, parent, area, left_or_right):
@@ -302,7 +305,6 @@ class Tree:
                 self.add_lead(parent, new_areas[1], "right")
                 #parent.left = TreeNode(new_areas[0], parent, Type.Area)
                 #parent.right = TreeNode(new_areas[1], parent, Type.Area)
-
 
 
 def main():
