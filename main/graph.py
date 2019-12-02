@@ -22,7 +22,10 @@ class Point:
         a = (p2.y - p1.y) / (p2.x - p1.x)  # współczynnik kierunkowy
         b = p1.y - ((p2.y - p1.y) * p1.x) / (p2.x - p1.x)  # wyraz wolny
 
-        return self.y > a*self.x + b
+        return self.y > a * self.x + b
+
+    def to_list(self):
+        return [self.x, self.y]
 
 
 class Line:
@@ -35,6 +38,13 @@ class Line:
 
         self.p1 = min(p1, p2)
         self.p2 = max(p1, p2)
+
+        if p2.x - p1.x == 0:
+            self.a = 0
+            self.b = 0
+        else:
+            self.a = (p2.y - p1.y) / (p2.x - p1.x)  # współczynnik kierunkowy
+            self.b = p1.y - ((p2.y - p1.y) * p1.x) / (p2.x - p1.x)  # wyraz wolny
 
         self.polygon = None
 
@@ -50,6 +60,9 @@ class Line:
     def print_line(self):
         print("[[{}, {}], [{}, {}]]".format(self.p1.x, self.p1.y, self.p2.x, self.p2.y))
 
+    def to_list(self):
+        return [self.p1.to_list(), self.p2.to_list()]
+
 
 class Polygon:
     def __init__(self, points):
@@ -62,7 +75,7 @@ class Polygon:
         lines = []
 
         for i in range(len(points)):
-            lines.append(Line(points[i], points[(i+1) % len(points)]))
+            lines.append(Line(points[i], points[(i + 1) % len(points)]))
 
         self.lines = lines
 
@@ -84,7 +97,7 @@ class Area:
         if not isinstance(other, Area):
             # don't attempt to compare against unrelated types
             return NotImplemented
-        return self.top_line == other.top_line and self.left_p == other.left_p and self.right_p == other.right_p and self.but_line == other.but_line
+        return self.top_line == self.top_line and self.left_p == self.left_p and self.right_p == self.right_p and self.but_line == other.but_line
 
     def print_area(self):
         self.top_line.print_line()
@@ -140,9 +153,9 @@ def follow_segment(start_area, line):
     areas = [start_area]
     while line.p2.x > areas[j].right_p.x:
         if areas[j].right_p.is_above(line):
-            areas.append(areas[j].top_right)
-        else:
             areas.append(areas[j].but_right)
+        else:
+            areas.append(areas[j].top_right)
         j += 1
 
     return areas
@@ -184,7 +197,7 @@ def update_map(start_area, line):
         left_area.top_right = top_area  # connections from left area
         left_area.but_right = but_area
 
-        top_area.top_left = left_area   # connections to left area
+        top_area.top_left = left_area  # connections to left area
         top_area.but_left = left_area
         but_area.top_left = left_area
         but_area.but_left = left_area
@@ -344,20 +357,10 @@ def update_map(start_area, line):
         new_areas.append(top_area)  # adding last 2 areas to the list (no right area)
         new_areas.append(but_area)
 
-    for x in new_areas:
-        print(" Prawy : ", x.right_p.x, x.right_p.y)
-        print(" LEwy: ", x.left_p.x, x.left_p.y)
-    print("")
-
-
     return old_areas, new_areas  # returning 2 lists
 
-
-
 # all_polygons = make_polygons_from_json("../polygons/polygons_1.json")
-
-# all_lines = extract_all_lines(all_polygons)
-
+#
 # all_lines = extract_all_lines(all_polygons)
 
 # areas = []
@@ -368,10 +371,10 @@ def update_map(start_area, line):
 # line_1 = Line([1, 1], [3, 3])
 #
 # olds, news = update_map(area1, line_1)
-#
-# olds[0].print_area()
-# for area in news:
-#     area.print_area()
+# #
+# # olds[0].print_area()
+# # for area in news:
+# #     area.print_area()
 #
 # line_2 = Line([1, 1], [5, 1])
 # olds, news = update_map(news[2], line_2)
@@ -388,4 +391,3 @@ def update_map(start_area, line):
 # for area in news:
 #     area.print_area()
 #
-

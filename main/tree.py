@@ -1,10 +1,4 @@
-import enum
-#from main.graph import *
-from PointLocation.main.graph import *
 
-import enum
-from PointLocation.main.graph import *
-# from PointLocation.main.main import *
 
 
 class Type(enum.Enum):
