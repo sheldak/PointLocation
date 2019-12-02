@@ -122,6 +122,7 @@ class Tree:
         return self
 
     def add_lead(self, parent, area, left_or_right):
+        area.print_area()
         if self.arr.get((area.left_p, area.right_p, area.top_line, area.but_line)) is None:
             if left_or_right == "left":
                 parent.left = TreeNode(area, parent, Type.Area)
@@ -145,9 +146,9 @@ class Tree:
 
             if i == 4:
                 break
-            if new_areas[j].left_p.x >= copy_root.key.right_p.x:
+            if new_areas[j].left_p.x > copy_root.key.right_p.x:
                 break
-            if new_areas[j].right_p.x > copy_root.key.left_p.x:
+            if new_areas[j].right_p.x >= copy_root.key.left_p.x:
                 i = i + 1
 
         print(i)
@@ -169,10 +170,10 @@ class Tree:
                 self.add_lead(parent, new_areas[0].but_right, "right")
 
             elif i == 3:
+                print("XDD")
                 parent.left = TreeNode(new_areas[0].right_p, parent, Type.Point)
                 parent = parent.left
                 if new_areas[0].left_p == copy_root.key.left_p:
-                    print("Lewy sie styka")
                     self.add_lead(parent, new_areas[2], "right")
                     parent.left = TreeNode(new_areas[0].but_line, parent, Type.Line)
                     parent = parent.left
@@ -183,7 +184,6 @@ class Tree:
                     #parent.right = TreeNode(new_areas[2].but_left, parent, Type.Area)
 
                 elif new_areas[0].but_right.top_line.p1 == copy_root.key.right_p:
-                    print("Prawy sie styka")
                     self.add_lead(parent, new_areas[0], "left")
                     #parent.left = TreeNode(new_areas[0], parent, Type.Area)
                     parent.right = TreeNode(new_areas[0].but_right.top_line, parent, Type.Line)
@@ -196,14 +196,11 @@ class Tree:
 
                 else:
                     if new_areas[0].left_p.x >= copy_root.key.left_p.x:
-                        print("Zaczyna na koncu")
                         self.add_lead(parent, new_areas[0], "left")
                         #parent.left = TreeNode(new_areas[0], parent, Type.Area)
                         parent.right = TreeNode(new_areas[0].top_right.but_line, parent, Type.Line)
                         parent = parent.right
                     else:
-                        print("Zaczyna na poczatku")
-                        print("LEFt")
                         parent.left = TreeNode(new_areas[0].but_line, parent, Type.Line)
                         parent.right = TreeNode(new_areas[2], parent, Type.Area)
                         parent = parent.left
@@ -212,8 +209,14 @@ class Tree:
                     self.add_lead(parent, new_areas[2].but_left, "right")
                     #parent.left = TreeNode(new_areas[0].top_right, parent, Type.Area)
                     #parent.right = TreeNode(new_areas[0].but_right, parent, Type.Area)
-                del new_areas[0]
-                del new_areas[0]
+                y1 = new_areas[0].top_line.p2.y
+                y2 = copy_root.key.but_line.p1.y
+                if y1 < y2:
+                    del new_areas[0]
+                    del new_areas[0]
+                else:
+                    del new_areas[0]
+                    del new_areas[1]
 
             elif i == 2:
                 parent.left = TreeNode(new_areas[0].but_line, parent, Type.Line)
@@ -222,7 +225,7 @@ class Tree:
                 self.add_lead(parent, new_areas[0], "left")
                 #parent.left = TreeNode(new_areas[0], parent, Type.Area)
                 self.add_lead(parent, new_areas[1], "right")
-                parent.right = TreeNode(new_areas[1], parent, Type.Area)
+                #parent.right = TreeNode(new_areas[1], parent, Type.Area)
 
         elif left_or_right == "right":
             if i == 4:
@@ -248,7 +251,6 @@ class Tree:
                 parent.right = TreeNode(new_areas[0].right_p, parent, Type.Point)
                 parent = parent.right
                 if new_areas[0].left_p == copy_root.key.left_p:
-                    print("Lewy sie styka")
                     self.add_lead(parent, new_areas[2], "right")
                     #parent.right = TreeNode(new_areas[2], parent, Type.Area)
                     parent.left = TreeNode(new_areas[0].but_line, parent, Type.Line)
@@ -260,7 +262,6 @@ class Tree:
                     #parent.right = TreeNode(new_areas[2].but_left, parent, Type.Area)
 
                 elif new_areas[0].but_right.top_line.p1 == copy_root.key.right_p:
-                    print("Prawy sie styka")
                     self.add_lead(parent, new_areas[0], "left")
                     #parent.left = TreeNode(new_areas[0], parent, Type.Area)
                     parent.right = TreeNode(new_areas[0].but_right.top_line, parent, Type.Line)
@@ -273,8 +274,6 @@ class Tree:
 
                 else:
                     if new_areas[0].left_p.x >= copy_root.key.left_p.x:
-                        print("Zaczyna na koncu")
-                        print("prawy")
                         self.add_lead(parent, new_areas[0], "left")
                         #parent.left = TreeNode(new_areas[0], parent, Type.Area)
                         parent.right = TreeNode(new_areas[0].top_right.but_line, parent, Type.Line)
@@ -286,17 +285,23 @@ class Tree:
                         self.add_lead(parent, new_areas[2], "right")
                         #parent.right = TreeNode(new_areas[2], parent, Type.Area)
                         parent = parent.left
-                    new_areas[2].pr
                     self.add_lead(parent, new_areas[2].top_left, "left")
                     self.add_lead(parent, new_areas[2].but_left, "right")
                     #parent.left = TreeNode(new_areas[0].top_right, parent, Type.Area)
                     #parent.right = TreeNode(new_areas[0].but_right, parent, Type.Area)
-                    del new_areas[0]
-                    del new_areas[0]
+                    y1 = new_areas[0].top_line.p2.y
+                    y2 = copy_root.key.but_line.p1.y
+                    if y1 < y2:
+                        del new_areas[0]
+                        del new_areas[0]
+                    else:
+                        del new_areas[0]
+                        del new_areas[1]
 
             elif i == 2:
                 parent.right = TreeNode(new_areas[0].but_line, parent, Type.Line)
                 parent = parent.right
+                print("Re")
 
                 self.add_lead(parent, new_areas[0], "left")
                 self.add_lead(parent, new_areas[1], "right")
@@ -308,12 +313,12 @@ class Tree:
 def main():
     # all_polygons = make_polygons_from_json("/polygons/polygons_1.json")
     # all_lines = extract_all_lines(all_polygons)
-    all_lines = make_lines_from_json("polygons/polygons_1.json")
+    all_lines = make_lines_from_json("polygons/lines_2.json")
     # TODO randomize lines
 
     roott = Tree().build_tree(all_lines)
     roott.print_tree(roott.root)
-    print(roott.find_area(Line(Point(50, 100), Point(150, 200))).key.right_p.x)
+    print(roott.find_area(Line(Point(5.8, 4.2), Point(150, 200))).key.left_p.x)
 
 
 main()
