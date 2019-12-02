@@ -1,4 +1,5 @@
-
+import enum
+from main.graph import *
 
 
 class Type(enum.Enum):
@@ -307,7 +308,7 @@ class Tree:
 def main():
     # all_polygons = make_polygons_from_json("/polygons/polygons_1.json")
     # all_lines = extract_all_lines(all_polygons)
-    all_lines = make_lines_from_json("polygons/lines_2.json")
+    all_lines = make_lines_from_json("../polygons/lines_2.json")
     # TODO randomize lines
 
     roott = Tree().build_tree(all_lines)
